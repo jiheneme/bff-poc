@@ -5,60 +5,62 @@ import com.example.data.repository.CardRepositoryImplMock
 import com.example.domain.usecases.GetProfileUseCase
 import com.example.presentation.routes.cardActionsRoutes
 import com.example.presentation.routes.profileRoutes
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.netty.*
+import io.ktor.server.plugins.calllogging.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
+import org.slf4j.event.Level
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation as ServerNegotiation
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientNegotiation
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.install
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
-import io.ktor.server.routing.routing
-import io.ktor.server.plugins.calllogging.*
-import io.ktor.server.request.httpMethod
-import io.ktor.server.request.path
-import io.ktor.server.request.uri
-import org.slf4j.event.Level
-import io.ktor.client.plugins.logging.*
 
-fun main() {
-    embeddedServer(Netty, port = 8080) {
-        // Configuration JSON
-        install(ServerNegotiation) { json() }
+fun main(args: Array<String>): Unit = EngineMain.main(args)
 
-        // --- AJOUT DU LOGGING ---
-        install(CallLogging) {
-            level = Level.INFO // Niveau de détail (INFO est parfait pour le dev)
+fun Application.module() {
+    println("URLs chargées : ${environment.config.property("services.user.url").getString()}")
+    println("URLs chargées : ${environment.config.property("services.cards.url").getString()}")
 
-            // Optionnel : Filtrer pour ne loguer que les appels /mobile
-            filter { call -> call.request.path().startsWith("/mobile") }
+    // Configuration JSON du serveur
+    install(ServerNegotiation) {
+        json()
+    }
 
-            // Optionnel : Personnaliser le format du log
-            format { call ->
-                val status = call.response.status()
-                val httpMethod = call.request.httpMethod.value
-                val userAgent = call.request.headers["User-Agent"]
-                "HTTP $status: $httpMethod ${call.request.uri} [Agent: $userAgent]"
-            }
+    // --- LECTURE DU FICHIER .CONF ---
+    val userUrl = environment.config.property("services.user.url").getString().removeSuffix("/")
+    val cardsUrl = environment.config.property("services.cards.url").getString().removeSuffix("/")
+
+    // --- CONFIGURATION DU LOGGING ---
+    install(CallLogging) {
+        level = Level.INFO
+        filter { call -> call.request.path().startsWith("/mobile") }
+        format { call ->
+            val status = call.response.status()
+            val httpMethod = call.request.httpMethod.value
+            "HTTP $status: $httpMethod ${call.request.uri}"
         }
+    }
 
-        // Client HTTP pour les microservices
-        val httpClient = HttpClient(CIO) {
-            install(io.ktor.client.plugins.logging.Logging) {
-                level = io.ktor.client.plugins.logging.LogLevel.BODY
-            }
-            install(ClientNegotiation) { json() }
+    // Client HTTP pour appeler les microservices
+    val httpClient = HttpClient(CIO) {
+        install(ClientNegotiation) {
+            json()
         }
-
-        // Injection de dépendances (Manuelle pour le PoC) add Koin / modules.kt later
-        //val repository = CardRepositoryImpl(httpClient)
-        val repository = CardRepositoryImplMock()
-        val getProfileUseCase = GetProfileUseCase(repository)
-
-        // Enregistrement des fichiers de routes séparés
-        routing {
-            profileRoutes(getProfileUseCase)
-            cardActionsRoutes(repository)
+        install(io.ktor.client.plugins.logging.Logging) {
+            level = io.ktor.client.plugins.logging.LogLevel.INFO
         }
-    }.start(wait = true)
+    }
+
+    // Initialisation des couches Domain et Data
+   // val repository = CardRepositoryImpl(httpClient, userUrl, cardsUrl)
+    val repository = CardRepositoryImplMock()
+    val getProfileUseCase = GetProfileUseCase(repository)
+
+    routing {
+        profileRoutes(getProfileUseCase)
+        cardActionsRoutes(repository)
+    }
+
 }

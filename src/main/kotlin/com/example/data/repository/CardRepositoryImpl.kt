@@ -12,18 +12,21 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.http.isSuccess
 
-class CardRepositoryImpl(private val client: HttpClient) : CardRepository {
+class CardRepositoryImpl(private val client: HttpClient,
+                         private val userBaseUrl: String,
+                         private val cardsBaseUrl: String) : CardRepository {
+
     override suspend fun findUserByEmail(email: String): UserEntity {
-        val dto = client.get("http://ms-user/users") { parameter("email", email) }.body<MSUserResponse>()
+        val dto = client.get("$userBaseUrl/users") { parameter("email", email) }.body<MSUserResponse>()
         return UserEntity(dto.id, dto.firstName, dto.email)
     }
 
     override suspend fun findCardsByUserId(userId: String): List<CardEntity> {
-        val dtos = client.get("http://ms-cards/list/$userId").body<List<MSCardResponse>>()
+        val dtos = client.get("$cardsBaseUrl/list/$userId").body<List<MSCardResponse>>()
         return dtos.map { CardEntity(it.cardId, it.pan.takeLast(4), it.state) }
     }
 
     override suspend fun requestCardBlock(cardId: String): Boolean {
-        return client.post("http://ms-cards/block/$cardId").status.isSuccess()
+        return client.post("$cardsBaseUrl/block/$cardId").status.isSuccess()
     }
 }

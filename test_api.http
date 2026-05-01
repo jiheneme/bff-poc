@@ -1,5 +1,5 @@
 ### Récupérer le profil agrégé
-GET http://localhost:8080/mobile/profile?email=test@***REMOVED***.com
+GET http://localhost:8081/mobile/users?email=test@***REMOVED***.com
 
 ### Bloquer une carte
-POST http://localhost:8080/mobile/cards/card_123/block
+POST http://localhost:8082/mobile/block/card_123
