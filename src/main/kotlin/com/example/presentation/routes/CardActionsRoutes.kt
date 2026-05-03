@@ -5,8 +5,12 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
+import org.koin.ktor.ext.inject
+import kotlin.getValue
 
-fun Route.cardActionsRoutes(repository: CardRepository) {
+fun Route.cardActionsRoutes() {
+
+    val repository by inject<CardRepository>()
         post("/mobile/cards/{id}/block") {
             val cardId = call.parameters["id"] ?: return@post call.respond(HttpStatusCode.BadRequest)
 

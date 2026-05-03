@@ -7,12 +7,14 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
+import org.koin.ktor.ext.inject
 
-fun Route.profileRoutes(useCase: GetProfileUseCase) {
+fun Route.profileRoutes() {
+    val getProfileUseCase by inject<GetProfileUseCase>()
         get("/mobile/profile") {
             val email = call.parameters["email"] ?: return@get call.respond(HttpStatusCode.BadRequest)
 
-            val (user, cards) = useCase.execute(email)
+            val (user, cards) = getProfileUseCase.execute(email)
 
             // Mapping Entity -> DTO Mobile
             val response = MobileProfileResponse(
