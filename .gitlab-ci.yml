@@ -1,0 +1,75 @@
+stages:
+  - build
+  - deploy_dev
+  - deploy_rec
+  - deploy_prod
+
+variables:
+  IMAGE_NAME: "europe-west1-docker.pkg.dev/$GCP_PROJECT_ID/my-repo/bff-poc"
+  REGION: "europe-west1"
+
+# --- ÉTAPE DE BUILD UNIQUE de l'image Docker ---
+build_image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - echo $GCP_SERVICE_KEY > gcp-key.json
+    - cat gcp-key.json | docker login -u _json_key --password-stdin https://europe-west1-docker.pkg.dev
+    - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA .
+    - docker push $IMAGE_NAME:$CI_COMMIT_SHA
+
+# Pour éviter de répéter le même code gcloud
+.deploy_template: &deploy_definition
+  image: google/cloud-sdk:latest
+  script:
+    - echo $GCP_SERVICE_KEY > gcp-key.json
+    - gcloud auth activate-service-account --key-file=gcp-key.json
+    - gcloud config set project $GCP_PROJECT_ID
+    - gcloud run deploy $SERVICE_NAME
+      --image $IMAGE_NAME:$CI_COMMIT_SHA
+      --region $REGION
+      --platform managed
+      --set-env-vars "MS_USER_URL=$MS_USER_URL,MS_CARDS_URL=$MS_CARDS_URL"
+      --allow-unauthenticated
+
+# --- ENVIRONNEMENT : DEV ---
+deploy_dev:
+  <<: *deploy_definition
+  stage: deploy_dev
+  variables:
+    SERVICE_NAME: "bff-poc-dev"
+    MS_USER_URL: "https://api-dev.jihene.com/users"
+    MS_CARDS_URL: "https://api-dev.jihene.com/cards"
+  environment:
+    name: development
+  only:
+    - main
+
+# --- ENVIRONNEMENT : RECETTE ---
+deploy_rec:
+  <<: *deploy_definition
+  stage: deploy_rec
+  variables:
+    SERVICE_NAME: "bff-poc-rec"
+    MS_USER_URL: "https://api-rec.jihene.com/users"
+    MS_CARDS_URL: "https://api-rec.jihene.com/cards"
+  environment:
+    name: staging
+  only:
+    - tags  # On déploie en REC quand on crée un tag (ex: v1.1.0)
+
+# --- ENVIRONNEMENT : PROD ---
+deploy_prod:
+  <<: *deploy_definition
+  stage: deploy_prod
+  variables:
+    SERVICE_NAME: "bff-poc-prod"
+    MS_USER_URL: "https://api.jihene.com/users"
+    MS_CARDS_URL: "https://api-jihene.com/cards"
+  environment:
+    name: production
+  when: manual  # Déclenchement manuel obligatoire pour la sécurité
+  only:
+    - tags
