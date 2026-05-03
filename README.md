@@ -1,8 +1,3 @@
-
-Here is the professional English version of your **README**, optimized for a GitHub or GitLab repository.
-
----
-
 # BFF - Mobile Aggregator (Ktor & Clean Architecture)
 
 This project is a **Backend-for-Frontend (BFF)** designed to aggregate data from multiple banking microservices (Users, Cards) and provide an optimized, single-entry response for iOS and Android mobile applications.
@@ -55,9 +50,3 @@ The project leverages the **HOCON** format (`application.conf`) to dynamically i
 * `MS_CARDS_URL`: Microservice Cards API endpoint.
 * `PORT`: Dynamic listening port injected by Google Cloud Run at runtime.
 
----
-
-### 💡 Pro-Tip for your Demo
-You might want to add a "Sequence Diagram" section to show how the BFF calls both the User and Card services in parallel before merging them—it’s a great way to show the "Aggregator" power of your project!
-
-Do you need help creating that sequence diagram or any other section?
