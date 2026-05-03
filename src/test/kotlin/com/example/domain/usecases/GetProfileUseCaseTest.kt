@@ -18,7 +18,7 @@ class GetProfileUseCaseTest {
     @Test
     fun `execute should return aggregated user and cards when repository returns data`() = runBlocking {
         // GIVEN
-        val email = "franck@***REMOVED***.com"
+        val email = "franck@gmail.com"
         val mockUser = UserEntity("user_1", "Franck", email)
         val mockCards = listOf(
             CardEntity("id_1", "4242", "ACTIVE"),

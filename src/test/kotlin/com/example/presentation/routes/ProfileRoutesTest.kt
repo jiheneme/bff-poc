@@ -25,9 +25,7 @@ class ProfileRoutesTest {
 
     @Test
     fun `test get profile route`() = testApplication {
-        // 'application' est le bloc où l'on configure le serveur de test
         application {
-            // Utilisation explicite de 'this' pour éviter l'erreur de receiver
             this.install(ContentNegotiation) {
                 json()
             }
