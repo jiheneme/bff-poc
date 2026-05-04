@@ -16,7 +16,6 @@ fun Application.module() {
 
     install(Koin) {
         slf4jLogger()
-        // On injecte la config Ktor pour que ServiceConfig puisse la lire dans AppModule
         modules(module { single { environment.config } }, appModule)
     }
 

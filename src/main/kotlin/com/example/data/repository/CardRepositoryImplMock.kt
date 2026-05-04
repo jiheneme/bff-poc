@@ -2,6 +2,7 @@ package com.example.data.repository
 
 import com.example.data.remote.MSCardResponse
 import com.example.data.remote.MSUserResponse
+import com.example.data.remote.mappers.toDomain
 import com.example.domain.models.CardEntity
 import com.example.domain.models.UserEntity
 import com.example.domain.repository.CardRepository
@@ -13,27 +14,28 @@ class CardRepositoryImplMock : CardRepository {
     private val jsonParser = Json { ignoreUnknownKeys = true }
 
     override suspend fun findUserByEmail(email: String): UserEntity {
-        // Chargement depuis le fichier JSON
         val dto = loadMock<MSUserResponse>("mocks/user_mock.json")
-        return UserEntity(dto.id, dto.firstName, dto.email)
+        return dto.toDomain()
     }
 
     override suspend fun findCardsByUserId(userId: String): List<CardEntity> {
-        // On peut simuler une liste en dur ici pour simplifier le PoC
+        // Simulation de DTOs MSCardResponse
         val dtos = listOf(
             MSCardResponse(cardId = "card_888", pan = "4242424242424242", state = "ACTIVE"),
             MSCardResponse(cardId = "card_999", pan = "1234123412341234", state = "BLOCKED")
         )
-        return dtos.map { CardEntity(it.cardId, it.pan.takeLast(4), it.state) }
+
+        // Utilisation du mapper sur chaque élément de la liste
+        return dtos.map { it.toDomain() }
     }
 
     override suspend fun requestCardBlock(cardId: String): Boolean {
-        return true // Toujours OK en mode Mock
+        return true // succès
     }
 
     private inline fun <reified T> loadMock(fileName: String): T {
         val inputStream: InputStream = this::class.java.classLoader.getResourceAsStream(fileName)
-            ?: throw Exception("Mock file not found: $fileName")
+            ?: throw Exception("Mock file not found in resources: $fileName")
         val jsonString = inputStream.bufferedReader().use { it.readText() }
         return jsonParser.decodeFromString(jsonString)
     }

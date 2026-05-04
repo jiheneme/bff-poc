@@ -1,13 +1,10 @@
 package com.example
 
+import com.example.data.remote.HttpClientFactory
 import com.example.data.repository.CardRepositoryImpl
 import com.example.data.repository.CardRepositoryImplMock
 import com.example.domain.repository.CardRepository
 import com.example.domain.usecases.GetProfileUseCase
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
 import org.koin.dsl.module
 
@@ -15,20 +12,20 @@ val appModule = module {
 
     single { ServiceConfig(get<ApplicationConfig>()) }
 
-    single {
-        HttpClient(CIO) {
-            install(ContentNegotiation) { json() }
-        }
-    }
+    // Utilisation du Networker (HttpClientFactory)
+    single { HttpClientFactory.create() }
 
     single<CardRepository> {
         val config = get<ServiceConfig>()
-        CardRepositoryImpl(// CardRepositoryImplMock to test
+
+        // Pour utiliser le Mock durant les tests, remplace CardRepositoryImpl par CardRepositoryImplMock()
+        CardRepositoryImpl(
             client = get(),
             userBaseUrl = config.userUrl,
             cardsBaseUrl = config.cardsUrl
         )
     }
 
+    // Use Cases
     single { GetProfileUseCase(get()) }
 }
