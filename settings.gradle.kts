@@ -1,4 +1,4 @@
-rootProject.name = "bff-poc"
+rootProject.name = "bff-kotlin"
 
 pluginManagement {
     repositories {

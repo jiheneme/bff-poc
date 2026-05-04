@@ -11,6 +11,6 @@ FROM eclipse-temurin:21-jre-alpine
 EXPOSE 8080
 
 # On récupère le JAR généré (on utilise une wildcard pour être sûr du nom)
-COPY --from=build /home/gradle/src/build/libs/*-all.jar /app/bff-poc.jar
+COPY --from=build /home/gradle/src/build/libs/*-all.jar /app/bff-kotlin.jar
 
-ENTRYPOINT ["java", "-jar", "/app/bff-poc.jar"]
+ENTRYPOINT ["java", "-jar", "/app/bff-kotlin.jar"]

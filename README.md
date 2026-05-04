@@ -39,8 +39,8 @@ This PoC is "Cloud-Ready" and built with industrial standards in mind:
 3.  **Test Endpoint**: [http://localhost:8080/mobile/profile?email=test@gmail.com](http://localhost:8080/mobile/profile?email=test@gmail.com)
 
 ### Running with Docker
-1.  **Build Image**: `docker build -t bff-poc:latest .`
-2.  **Run Container**: `docker run -p 8080:8080 --name bff-poc bff-poc:latest`
+1.  **Build Image**: `docker build -t bff-kotlin:latest .`
+2.  **Run Container**: `docker run -p 8080:8080 --name bff-kotlin bff-poc:latest`
 
 ## ⚙️ Multi-Environment Configuration
 
