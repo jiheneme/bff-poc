@@ -1,28 +1,22 @@
 package com.example.presentation.routes
 
 import com.example.domain.usecases.GetProfileUseCase
-import com.example.presentation.responses.MobileCardResponse
-import com.example.presentation.responses.MobileProfileResponse
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
+import com.example.presentation.mappers.toMobileProfileResponse
+import io.ktor.http.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
 fun Route.profileRoutes() {
     val getProfileUseCase by inject<GetProfileUseCase>()
-        get("/mobile/profile") {
-            val email = call.parameters["email"] ?: return@get call.respond(HttpStatusCode.BadRequest)
 
-            val (user, cards) = getProfileUseCase.execute(email)
+    get("/mobile/profile") {
+        val email = call.parameters["email"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Email requis")
 
-            // Mapping Entity -> DTO Mobile
-            val response = MobileProfileResponse(
-                userName = user.name,
-                cards = cards.map {
-                    MobileCardResponse(it.id, "Carte **** ${it.lastFour}", it.status == "ACTIVE")
-                }
-            )
-            call.respond(response)
-        }
+        val (user, cards) = getProfileUseCase.execute(email)
+
+        val response = toMobileProfileResponse(user, cards)
+
+        call.respond(response)
     }
+}

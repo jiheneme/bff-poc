@@ -5,6 +5,7 @@ import com.example.data.repository.CardRepositoryImpl
 import com.example.data.repository.CardRepositoryImplMock
 import com.example.domain.repository.CardRepository
 import com.example.domain.usecases.GetProfileUseCase
+import com.example.domain.usecases.BlockCardUseCase
 import io.ktor.server.config.*
 import org.koin.dsl.module
 
@@ -28,4 +29,5 @@ val appModule = module {
 
     // Use Cases
     single { GetProfileUseCase(get()) }
+    single { BlockCardUseCase(get()) }
 }

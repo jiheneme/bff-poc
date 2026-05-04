@@ -1,5 +1,6 @@
 ### Récupérer le profil agrégé
 GET http://localhost:8081/mobile/users?email=test@***REMOVED***.com
 
-### Bloquer une carte
-POST http://localhost:8082/mobile/block/card_123
+### Test de blocage de carte
+POST http://localhost:8080/mobile/cards/card_888/block
+Content-Type: application/json

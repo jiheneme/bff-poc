@@ -15,6 +15,8 @@ import io.mockk.mockk
 import org.koin.ktor.plugin.Koin // Import pour koin-ktor 3.6.0
 import org.koin.dsl.module
 import io.ktor.server.routing.* // Import indispensable pour l'extension .routing
+import org.koin.core.context.stopKoin
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -22,6 +24,11 @@ import kotlin.test.assertTrue
 class ProfileRoutesTest {
 
     private val useCaseMock = mockk<GetProfileUseCase>()
+
+    @AfterTest
+    fun tearDown() {
+        stopKoin()
+    }
 
     @Test
     fun `test get profile route`() = testApplication {
