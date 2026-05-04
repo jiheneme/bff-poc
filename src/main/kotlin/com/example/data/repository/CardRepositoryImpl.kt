@@ -11,6 +11,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 
 class CardRepositoryImpl(
@@ -20,17 +21,30 @@ class CardRepositoryImpl(
 ) : CardRepository {
 
     override suspend fun findUserByEmail(email: String): UserEntity {
-        return client.get("$userBaseUrl/users") {
+        val response = client.get("$userBaseUrl/users") {
             parameter("email", email)
-        }.body<MSUserResponse>().toDomain()
+        }
+
+        return when (response.status) {
+            HttpStatusCode.OK -> response.body<MSUserResponse>().toDomain()
+            HttpStatusCode.NotFound -> throw Exception("User not found for email: $email")
+            else -> throw Exception("Technical error from User Service: ${response.status}")
+        }
     }
 
     override suspend fun findCardsByUserId(userId: String): List<CardEntity> {
-        val dtos = client.get("$cardsBaseUrl/list/$userId").body<List<MSCardResponse>>()
-        return dtos.map { it.toDomain() }
+        val response = client.get("$cardsBaseUrl/list/$userId")
+
+        return if (response.status.isSuccess()) {
+            response.body<List<MSCardResponse>>().map { it.toDomain() }
+        } else {
+            // On peut décider de renvoyer une liste vide ou de lever une erreur
+            emptyList()
+        }
     }
 
     override suspend fun requestCardBlock(cardId: String): Boolean {
-        return client.post("$cardsBaseUrl/block/$cardId").status.isSuccess()
+        val response = client.post("$cardsBaseUrl/block/$cardId")
+        return response.status.isSuccess()
     }
 }

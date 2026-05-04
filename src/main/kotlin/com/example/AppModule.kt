@@ -19,7 +19,7 @@ val appModule = module {
     single<CardRepository> {
         val config = get<ServiceConfig>()
 
-        // Pour utiliser le Mock durant les tests, remplace CardRepositoryImpl par CardRepositoryImplMock()
+        // Pour utiliser le Mock, remplace CardRepositoryImpl par CardRepositoryImplMock()
         CardRepositoryImpl(
             client = get(),
             userBaseUrl = config.userUrl,
