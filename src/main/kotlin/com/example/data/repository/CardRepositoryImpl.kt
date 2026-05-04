@@ -6,6 +6,8 @@ import com.example.data.remote.mappers.toDomain
 import com.example.domain.models.UserEntity
 import com.example.domain.models.CardEntity
 import com.example.domain.repository.CardRepository
+import com.example.domain.exceptions.UserNotFoundException
+import com.example.domain.exceptions.RemoteServiceException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -21,17 +23,14 @@ class CardRepositoryImpl(
 ) : CardRepository {
 
     override suspend fun findUserByEmail(email: String): UserEntity {
-        val response = client.get("$userBaseUrl/users") {
-            parameter("email", email)
-        }
+        val response = client.get("$userBaseUrl/users") { parameter("email", email) }
 
         return when (response.status) {
             HttpStatusCode.OK -> response.body<MSUserResponse>().toDomain()
-            HttpStatusCode.NotFound -> throw Exception("User not found for email: $email")
-            else -> throw Exception("Technical error from User Service: ${response.status}")
+            HttpStatusCode.NotFound -> throw UserNotFoundException(email)
+            else -> throw RemoteServiceException("User-Service", response.status.value)
         }
     }
-
     override suspend fun findCardsByUserId(userId: String): List<CardEntity> {
         val response = client.get("$cardsBaseUrl/list/$userId")
 

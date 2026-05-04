@@ -6,12 +6,13 @@ import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
+import kotlin.text.get
 
 fun Route.profileRoutes() {
     val getProfileUseCase by inject<GetProfileUseCase>()
 
     get("/mobile/profile") {
-        val email = call.parameters["email"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Email requis")
+        val email = call.parameters["email"] ?: return@get call.respond(HttpStatusCode.BadRequest)
 
         val (user, cards) = getProfileUseCase.execute(email)
 
