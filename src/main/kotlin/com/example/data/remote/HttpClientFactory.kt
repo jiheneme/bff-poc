@@ -6,10 +6,8 @@ import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
-import io.ktor.client.plugins.compression.*
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpHeaders.ContentEncoding
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -21,11 +19,6 @@ object HttpClientFactory {
             requestTimeoutMillis = 5000 // 5 secondes
             connectTimeoutMillis = 2000
         }
-            /*  install(ContentEncoding) {
-            gzip()
-            deflate()
-        }*/ //on désactive la compression entre les miscroservices et le bff car pas besoin
-
         // Headers management
         install(DefaultRequest) {
             header(HttpHeaders.ContentType, ContentType.Application.Json)

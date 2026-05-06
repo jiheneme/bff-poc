@@ -6,24 +6,18 @@ import com.example.presentation.routes.profileRoutes
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import io.ktor.server.routing.*
-import org.koin.ktor.plugin.Koin
-import org.koin.logger.slf4jLogger
-import org.koin.dsl.module
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 fun Application.module() {
-
-    install(Koin) {
-        slf4jLogger()
-        modules(module { single { environment.config } }, appModule)
-    }
-
+    // 1. Plugins & DI
+    configureDependencyInjection()
     configureSerialization()
     configureMonitoring()
     configureStatusPages()
     configureCompression()
 
+    // 2. Routage
     routing {
         profileRoutes()
         cardActionsRoutes()

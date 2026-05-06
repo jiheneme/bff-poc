@@ -4,6 +4,7 @@ import com.example.domain.models.CardEntity
 import com.example.domain.models.UserEntity
 import com.example.domain.usecases.GetProfileUseCase
 import com.example.presentation.responses.MobileProfileResponse
+import com.example.presentation.controllers.ProfileController
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -32,7 +33,13 @@ class ProfileRoutesTest {
         application {
             // Côté Serveur
             install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) { json() }
-            install(Koin) { modules(module { single { useCaseMock } }) }
+            install(Koin) {
+                modules(module {
+                    single { useCaseMock }
+                    single { ProfileController(get()) }
+                })
+            }
+
             routing { profileRoutes() }
         }
 

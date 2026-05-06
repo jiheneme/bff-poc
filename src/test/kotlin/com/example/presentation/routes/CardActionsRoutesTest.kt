@@ -3,6 +3,7 @@ package com.example.presentation.routes
 import com.example.domain.usecases.BlockCardUseCase
 import com.example.presentation.responses.MobileCardActionResponse
 import com.example.plugins.configureStatusPages
+import com.example.presentation.controllers.CardController
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -31,7 +32,10 @@ class CardActionsRoutesTest {
     fun `test post block card success`() = testApplication {
         application {
             install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) { json() }
-            install(Koin) { modules(module { single { blockUseCaseMock } }) }
+            install(Koin) { modules(module {
+                single { blockUseCaseMock }
+                single { CardController(get()) }
+            }) }
             routing { cardActionsRoutes() }
         }
 
@@ -56,7 +60,10 @@ class CardActionsRoutesTest {
     fun `test post block card failure`() = testApplication {
         application {
             install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) { json() }
-            install(Koin) { modules(module { single { blockUseCaseMock } }) }
+            install(Koin) { modules(module {
+                single { blockUseCaseMock }
+                single { CardController(get()) }
+            }) }
             routing { cardActionsRoutes() }
         }
 
@@ -81,7 +88,10 @@ class CardActionsRoutesTest {
         application {
             configureStatusPages()
             install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) { json() }
-            install(Koin) { modules(module { single { blockUseCaseMock } }) }
+            install(Koin) { modules(module {
+                single { blockUseCaseMock }
+                single { CardController(get()) }
+            }) }
             routing { cardActionsRoutes() }
         }
 
