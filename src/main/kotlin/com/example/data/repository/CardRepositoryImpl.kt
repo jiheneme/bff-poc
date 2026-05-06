@@ -12,6 +12,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.plugins.*
 import io.ktor.client.request.post
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
@@ -41,9 +42,12 @@ class CardRepositoryImpl(
             emptyList()
         }
     }
-
     override suspend fun requestCardBlock(cardId: String): Boolean {
-        val response = client.post("$cardsBaseUrl/block/$cardId")
+        val response = client.post("$cardsBaseUrl/block/$cardId") {
+            timeout {
+                requestTimeoutMillis = 2000 // 2 secondes au lieu de 5
+            }
+        }
         return response.status.isSuccess()
     }
 }

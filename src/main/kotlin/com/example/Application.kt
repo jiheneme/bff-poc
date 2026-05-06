@@ -22,6 +22,7 @@ fun Application.module() {
     configureSerialization()
     configureMonitoring()
     configureStatusPages()
+    configureCompression()
 
     routing {
         profileRoutes()
