@@ -1,6 +1,6 @@
 package com.example.di
 
-import com.example.ServiceConfig
+import com.example.config.ServiceConfig
 import com.example.data.remote.HttpClientFactory
 import com.example.data.repository.CardRepositoryImpl
 import com.example.domain.repository.CardRepository
