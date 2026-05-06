@@ -8,7 +8,7 @@ import com.example.domain.models.UserEntity
 fun MSUserResponse.toDomain(): UserEntity {
     return UserEntity(
         id = this.id,
-        name = this.firstName, // On mappe firstName (DTO) vers name (Entity)
+        name = this.firstName,
         email = this.email
     )
 }

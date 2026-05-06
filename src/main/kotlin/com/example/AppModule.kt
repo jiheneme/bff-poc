@@ -13,7 +13,6 @@ val appModule = module {
 
     single { ServiceConfig(get<ApplicationConfig>()) }
 
-    // Utilisation du Networker (HttpClientFactory)
     single { HttpClientFactory.create() }
 
     single<CardRepository> {

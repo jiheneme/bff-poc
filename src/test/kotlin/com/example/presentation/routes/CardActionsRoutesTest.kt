@@ -2,6 +2,7 @@ package com.example.presentation.routes
 
 import com.example.domain.usecases.BlockCardUseCase
 import com.example.presentation.responses.MobileCardActionResponse
+import com.example.plugins.configureStatusPages
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -45,7 +46,6 @@ class CardActionsRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
 
-        //Désérialisation
         val body = response.body<MobileCardActionResponse>()
         assertEquals(cardId, body.cardId)
         assertTrue(body.isSuccess)
@@ -74,5 +74,25 @@ class CardActionsRoutesTest {
 
         val body = response.body<MobileCardActionResponse>()
         assertEquals(false, body.isSuccess)
+    }
+
+    @Test
+    fun `test status pages handles connection error`() = testApplication {
+        application {
+            configureStatusPages()
+            install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) { json() }
+            install(Koin) { modules(module { single { blockUseCaseMock } }) }
+            routing { cardActionsRoutes() }
+        }
+
+        val client = createClient { install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) { json() } }
+
+        // On simule une erreur réseau que le Repo lancerait normalement
+        coEvery { blockUseCaseMock.execute(any()) } throws java.net.ConnectException("Service Down")
+
+        val response = client.post("/mobile/cards/123/block")
+
+        // Vérifie que StatusPages a transformé le crash en 503
+        assertEquals(HttpStatusCode.ServiceUnavailable, response.status)
     }
 }

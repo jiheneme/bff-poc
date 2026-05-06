@@ -11,7 +11,6 @@ import kotlin.test.assertEquals
 
 class GetProfileUseCaseTest {
 
-    // On mocke l'interface du repository
     private val repository = mockk<CardRepository>()
     private val useCase = GetProfileUseCase(repository)
 
@@ -25,7 +24,6 @@ class GetProfileUseCaseTest {
             CardEntity("id_2", "1234", "BLOCKED")
         )
 
-        // On définit le comportement du mock (coEvery pour les fonctions suspend)
         coEvery { repository.findUserByEmail(email) } returns mockUser
         coEvery { repository.findCardsByUserId("user_1") } returns mockCards
 
