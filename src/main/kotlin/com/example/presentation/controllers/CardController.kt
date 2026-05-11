@@ -2,8 +2,10 @@ package com.example.presentation.controllers
 
 import com.example.domain.usecases.BlockCardUseCase
 import com.example.presentation.mappers.toCardActionResponse
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
+import io.ktor.server.response.header
 import io.ktor.server.response.respond
 import org.slf4j.LoggerFactory
 
@@ -24,6 +26,7 @@ class CardController(private val blockCardUseCase: BlockCardUseCase) {
 
         if (isSuccess) {
             logger.info("Success: Card {} blocked in {}ms", cardId, duration)
+            call.response.header(HttpHeaders.CacheControl, "no-store, max-age=0") // Action sensible pas de caching ici
             call.respond(HttpStatusCode.OK, response)
         } else {
             logger.warn("Business Failure: Card {} could not be blocked (Duration: {}ms)", cardId, duration)

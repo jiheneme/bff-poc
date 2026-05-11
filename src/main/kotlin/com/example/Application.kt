@@ -16,6 +16,7 @@ fun Application.module() {
     configureMonitoring()
     configureStatusPages()
     configureCompression()
+    configureCaching()
 
     // 2. Routage
     routing {

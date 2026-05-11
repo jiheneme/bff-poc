@@ -10,10 +10,12 @@ import com.example.domain.exceptions.UserNotFoundException
 import com.example.domain.exceptions.RemoteServiceException
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import  io.ktor.client.request.header
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.plugins.*
 import io.ktor.client.request.post
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 
@@ -33,7 +35,10 @@ class CardRepositoryImpl(
         }
     }
     override suspend fun findCardsByUserId(userId: String): List<CardEntity> {
-        val response = client.get("$cardsBaseUrl/list/$userId")
+        val response = client.get("$cardsBaseUrl/list/$userId") {
+            // On force le client à ignorer la gestion du cache des microservices => 60 sec
+            header(HttpHeaders.CacheControl, "max-age=60")
+        }
 
         return if (response.status.isSuccess()) {
             response.body<List<MSCardResponse>>().map { it.toDomain() }

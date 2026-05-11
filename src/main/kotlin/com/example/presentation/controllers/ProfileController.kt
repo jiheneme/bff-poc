@@ -25,6 +25,8 @@ class ProfileController(private val getProfileUseCase: GetProfileUseCase) {
         val duration = System.currentTimeMillis() - startTime
 
         logger.info("Success: Profile for {} fetched in {}ms", email, duration)
+        // On ajoute manuellement un header de cache pour 5 minutes
+        call.response.cacheControl(CacheControl.MaxAge(maxAgeSeconds = 300))
         call.respond(response)
     }
 }

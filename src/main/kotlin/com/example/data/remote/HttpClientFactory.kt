@@ -3,6 +3,7 @@ package com.example.data.remote
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
@@ -31,5 +32,6 @@ object HttpClientFactory {
                 isLenient = true
             })
         }
+        install(HttpCache) // Active le cache automatique basé sur les headers HTTP des microservices
     }
 }

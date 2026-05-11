@@ -3,6 +3,7 @@ package com.example.di
 import com.example.config.ServiceConfig
 import com.example.data.remote.HttpClientFactory
 import com.example.data.repository.CardRepositoryImpl
+import com.example.data.repository.CardRepositoryImplMock
 import com.example.domain.repository.CardRepository
 import com.example.domain.usecases.*
 import com.example.presentation.controllers.*
@@ -14,11 +15,12 @@ val dataModule = module {
 
     single<CardRepository> {
         val config = get<ServiceConfig>()
-        CardRepositoryImpl( // On peut utiliser CardRepositoryImplMock() pour tester
+        CardRepositoryImpl(
             client = get(),
             userBaseUrl = config.userUrl,
             cardsBaseUrl = config.cardsUrl
         )
+       // CardRepositoryImplMock()
     }
 }
 
