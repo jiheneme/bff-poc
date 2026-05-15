@@ -9,16 +9,18 @@ import io.ktor.server.routing.*
 
 fun main(args: Array<String>): Unit = EngineMain.main(args)
 
-fun Application.module() {
-    // 1. Plugins & DI
-    configureDependencyInjection()
+fun Application.module(testing: Boolean = false) {
+
     configureSerialization()
     configureMonitoring()
     configureStatusPages()
     configureCompression()
     configureCaching()
 
-    // 2. Routage
+    if (!testing) {
+        configureDependencyInjection()
+    }
+
     routing {
         profileRoutes()
         cardActionsRoutes()

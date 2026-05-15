@@ -15,15 +15,14 @@ val dataModule = module {
 
     single<CardRepository> {
         val config = get<ServiceConfig>()
-        CardRepositoryImpl(
+       /* CardRepositoryImpl(
             client = get(),
             userBaseUrl = config.userUrl,
             cardsBaseUrl = config.cardsUrl
-        )
-       // CardRepositoryImplMock()
+        )*/
+        CardRepositoryImplMock()
     }
 }
-
 // --- DOMAIN ---
 val domainModule = module {
     single { GetProfileUseCase(get()) }
